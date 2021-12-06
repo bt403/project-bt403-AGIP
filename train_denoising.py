@@ -7,7 +7,7 @@ from parsing import get_parser
 from models.FFDNet import FFDNet
 from dataloaders import DataLoaderDenoising
 from tqdm import tqdm
-
+from time import sleep
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 args = get_parser().parse_args()
@@ -49,6 +49,7 @@ for epoch in range(args.epochs):
         running_loss += total_loss.item()
         total_loss.backward()
         optimizer.step()
+        sleep(0.01)
         torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
 
     print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
