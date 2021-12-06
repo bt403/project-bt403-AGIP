@@ -25,7 +25,8 @@ validationloader = dataLoaderDenoising.get_validationloader()
 tcr = TCR().to(device)
 for epoch in range(args.epochs):   
     running_loss = 0.0
-    for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=len(trainloader))):
+    total_iter = min(len(trainloader), len(trainloader_un))
+    for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
         #data_sup, data_un = batch[0] , batch[1]
         input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
         input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
