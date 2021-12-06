@@ -40,12 +40,10 @@ for epoch in range(args.epochs):
             transformed_input= tcr(input_un,random.to(device))
             loss_tcr= criterion_mse(denoise_model(transformed_input), tcr(denoise_model(input_un),random))
             total_loss= loss + args.weight_tcr*loss_tcr
+            print("Loss TCR %f", loss_tcr)
         else:
             total_loss= loss
-        
-        print("Loss %f", loss)
-        print("Loss Ours %f", loss_tcr)
-
+            
         running_loss += total_loss.item()
         total_loss.backward()
         optimizer.step()
