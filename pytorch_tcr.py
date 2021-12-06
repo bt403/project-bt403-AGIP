@@ -13,6 +13,8 @@ import numpy as np
 import kornia
 import torch.nn as nn
 
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
 class TCR(nn.Module):
     def __init__(self):
         super(TCR, self).__init__()
@@ -49,7 +51,7 @@ class TCR(nn.Module):
         for i in range(bs):
             T[i]= torch.tensor([[T11[i], T12[i], T13[i]], [T21[i], T22[i], T23[i]]])   # Transformation Matrix for a batch
             
-        Transformed_img = kornia.geometry.transform.warp_affine(img, T, dsize=(W, H))   
+        Transformed_img = kornia.geometry.transform.warp_affine(img, T.to(device), dsize=(W, H)).to(device)
 
         return Transformed_img
     

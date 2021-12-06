@@ -15,7 +15,7 @@ denoise_model = FFDNet(3,3,96,15)
 denoise_model.load_state_dict(torch.load(args.model_path)).to(device)
 denoise_model.eval()
 
-dataLoaderDenoising = DataLoaderDenoising(args.batch_size)
+dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
 validationloader = dataLoaderDenoising.get_validationloader()
 criterion_mse = nn.MSELoss().to(device)
 
