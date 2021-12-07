@@ -58,7 +58,7 @@ if args.with_tcr > 0:
 
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] total loss: %.3f' % (epoch + 1, running_loss ))     
-        print('[%d] tcr loss: %.3f' % (loss_tcr))     
+        print('tcr loss: %.3f' % (loss_tcr))     
 else:
     for epoch in range(args.epochs):   
         running_loss = 0.0
