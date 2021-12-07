@@ -12,7 +12,7 @@ from time import sleep
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 args = get_parser().parse_args()
 
-denoise_model = FFDNet(3,3,96,15).to(device)
+denoise_model = FFDNet(3,3,96,15, args.batch_size).to(device)
 tcr = TCR().to(device)
 optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
 criterion_mse = nn.MSELoss().to(device)

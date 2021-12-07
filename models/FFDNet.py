@@ -111,7 +111,7 @@ class PixelUnShuffle(nn.Module):
 
 
 class FFDNet(nn.Module):
-    def __init__(self, in_nc=1, out_nc=1, nc=64, nb=15, act_mode='R'):
+    def __init__(self, in_nc=1, out_nc=1, nc=64, nb=15, b_size=10, act_mode='R'):
         """
         # ------------------------------------
         in_nc: channel number of input
@@ -134,10 +134,11 @@ class FFDNet(nn.Module):
         m_tail = conv(nc, out_nc*sf*sf, mode='C', bias=bias)
 
         self.model = sequential(m_head, *m_body, m_tail)
+        self.b_size = b_size
 
         self.m_up = nn.PixelShuffle(upscale_factor=sf)
     
-    def forward(self, x, sigma=sigma, b_size=10):
+    def forward(self, x, sigma=sigma):
         sigma = sigma.to(device)
         h, w = x.size()[-2:]
         paddingBottom = int(np.ceil(h/2)*2-h)
@@ -145,7 +146,7 @@ class FFDNet(nn.Module):
         x = torch.nn.ReplicationPad2d((0, paddingRight, 0, paddingBottom))(x)
 
         x = self.m_down(x)
-        m = torch.ones(b_size, sigma.size()[1], x.size()[-2], x.size()[-1]).type_as(x).mul(sigma)
+        m = torch.ones(self.b_size, sigma.size()[1], x.size()[-2], x.size()[-1]).type_as(x).mul(sigma)
         #m = sigma.repeat(1, 1, x.size()[-2], x.size()[-1]).to(device)
         #print(x.shape)
         #print(m.shape)
