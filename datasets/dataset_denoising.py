@@ -53,6 +53,8 @@ class NoisyDataset(torch.utils.data.Dataset):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])
     img_path = self.imgs_path[idx]
     clean_img = Image.open(img_path).convert('RGB')
+    print(clean_img.size)
+    print("-----")
     left = np.random.randint(clean_img.size[0] - self.img_size[0])
     top = np.random.randint(clean_img.size[1] - self.img_size[1])
     # .crop(left, upper, right, lower)
