@@ -20,7 +20,29 @@ criterion_l1Loss = nn.L1Loss().to(device)
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
-validationloader = dataLoaderDenoising.get_validationloader()
+#validationloader = dataLoaderDenoising.get_validationloader()
+def train(data_sup, data_un, denoise_model, running_loss):
+    input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
+    input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
+    
+    optimizer.zero_grad()
+    outputs = denoise_model(input)
+    loss = criterion_mse(outputs,target)
+    
+    if args.with_tcr > 0:
+        bs=  input_un.shape[0]
+        random=torch.rand((bs, 1))
+        transformed_input= tcr(input_un,random.to(device))
+        loss_tcr= criterion_mse(denoise_model(transformed_input), tcr(denoise_model(input_un),random))
+        total_loss= loss + args.weight_tcr*loss_tcr
+        print("Loss TCR %f", loss_tcr)
+    else:
+        total_loss= loss
+
+    running_loss += total_loss.item()
+    total_loss.backward()
+    optimizer.step()
+    return running_loss
 
 tcr = TCR().to(device)
 for epoch in range(args.epochs):   
@@ -28,27 +50,8 @@ for epoch in range(args.epochs):
     total_iter = min(len(trainloader), len(trainloader_un))
     for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
         #data_sup, data_un = batch[0] , batch[1]
-        input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
-        input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
-        
-        optimizer.zero_grad()
-        outputs = denoise_model(input)
-        loss = criterion_mse(outputs,target)
-        
-        if args.with_tcr > 0:
-            bs=  input_un.shape[0]
-            random=torch.rand((bs, 1))
-            transformed_input= tcr(input_un,random.to(device))
-            loss_tcr= criterion_mse(denoise_model(transformed_input), tcr(denoise_model(input_un),random))
-            total_loss= loss + args.weight_tcr*loss_tcr
-            print("Loss TCR %f", loss_tcr)
-        else:
-            total_loss= loss
-
-        running_loss += total_loss.item()
-        total_loss.backward()
-        optimizer.step()
-        sleep(0.01)
+        running_loss = train(data_sup, data_un, denoise_model, running_loss)
+    if (epoch%10 == 0):
         torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
 
     print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
