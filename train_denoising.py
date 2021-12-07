@@ -18,7 +18,7 @@ optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
 criterion_mse = nn.MSELoss().to(device)
 criterion_l1Loss = nn.L1Loss().to(device)
 
-dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
+dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_unsup, args.workers)
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 
