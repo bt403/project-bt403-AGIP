@@ -9,10 +9,11 @@ from dataloaders import DataLoaderDenoising
 
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-args = get_parser()
+args = get_parser().parse_args()
 
 denoise_model = FFDNet(3,3,96,15)
-denoise_model.load_state_dict(torch.load(args.model_path)).to(device)
+denoise_model.load_state_dict(torch.load(args.model_path))
+denoise_model.to(device)
 denoise_model.eval()
 
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
