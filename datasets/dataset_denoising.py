@@ -56,8 +56,14 @@ class NoisyDataset(torch.utils.data.Dataset):
     print(img_path)
     print(clean_img.size)
     print("-----")
-    left = np.random.randint(clean_img.size[0] - self.img_size[0])
-    top = np.random.randint(clean_img.size[1] - self.img_size[1])
+    if (clean_img.size[0] > self.img_size[0]):
+        left = np.random.randint(clean_img.size[0] - self.img_size[0])
+    else:
+        left = 0
+    if (clean_img.size[1] > self.img_size[1]):
+        top = np.random.randint(clean_img.size[1] - self.img_size[1])
+    else:
+        top = 0
     # .crop(left, upper, right, lower)
     cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
     transform = tv.transforms.Compose([tv.transforms.ToTensor(),
