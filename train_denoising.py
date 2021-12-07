@@ -21,15 +21,14 @@ dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 #validationloader = dataLoaderDenoising.get_validationloader()
-def train(data_sup, data_un, denoise_model, running_loss):
+def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
     input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
     
     optimizer.zero_grad()
     outputs = denoise_model(input)
     loss = criterion_mse(outputs,target)
-    
-    if args.with_tcr > 0:
+    if with_tcr:
         bs=  input_un.shape[0]
         random=torch.rand((bs, 1))
         transformed_input= tcr(input_un,random.to(device))
@@ -45,17 +44,32 @@ def train(data_sup, data_un, denoise_model, running_loss):
     return running_loss
 
 tcr = TCR().to(device)
-for epoch in range(args.epochs):   
-    running_loss = 0.0
-    total_iter = min(len(trainloader), len(trainloader_un))
-    for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
-        #data_sup, data_un = batch[0] , batch[1]
-        running_loss = train(data_sup, data_un, denoise_model, running_loss)
-    if (epoch%10 == 0):
-        torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
 
-    print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
-    print('[%d] loss: %.3f' %
-                  (epoch + 1, running_loss ))      
+if args.with_tcr > 0:
+    for epoch in range(args.epochs):   
+        running_loss = 0.0
+        total_iter = min(len(trainloader), len(trainloader_un))
+        for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
+            #data_sup, data_un = batch[0] , batch[1]
+            running_loss = train(data_sup, data_un, denoise_model, running_loss, args.with_tcr)
+        if (epoch%10 == 0):
+            torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
+
+        print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
+        print('[%d] loss: %.3f' %
+                    (epoch + 1, running_loss ))     
+else:
+    for epoch in range(args.epochs):   
+        running_loss = 0.0
+        total_iter = min(len(trainloader), len(trainloader_un))
+        for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
+            #data_sup, data_un = batch[0] , batch[1]
+            running_loss = train(data_sup, data_un, denoise_model, running_loss, args.with_tcr)
+        if (epoch%10 == 0):
+            torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
+
+        print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
+        print('[%d] loss: %.3f' %
+                    (epoch + 1, running_loss ))   
 
 print('Finished Training')
