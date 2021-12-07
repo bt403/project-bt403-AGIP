@@ -91,7 +91,7 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
       self.imgs_path.append(os.path.join(self.img_dir, i))
 
     self.in_path_coco = in_path_coco # ./unlabeled2017
-    self.imgs_path += [f for f in os.listdir(self.in_path_coco ) if os.isfile(os.path.join(self.in_path_coco , f))]
+    self.imgs_path += [f for f in os.listdir(self.in_path_coco ) if os.path.isfile(os.path.join(self.in_path_coco , f))]
 
   def __len__(self):
       return len(self.imgs_path)
