@@ -63,7 +63,7 @@ else:
     for epoch in range(args.epochs):   
         running_loss = 0.0
         total_iter = len(trainloader)
-        for iteration, data_sup in enumerate(tqdm(trainloader), total=total_iter):
+        for iteration, data_sup in enumerate(tqdm(trainloader, total=total_iter)):
             #data_sup, data_un = batch[0] , batch[1]
             running_loss = train(data_sup, None, denoise_model, running_loss, args.with_tcr)
         if (epoch%10 == 0):
