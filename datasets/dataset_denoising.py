@@ -18,7 +18,7 @@ def addNoise(x, device):
     return x + (torch.randn(x.shape) * noiseLevel)
 
 class NoisyDataset(torch.utils.data.Dataset):
-  def __init__(self, in_path, mode='train', img_size=(320, 320), sigma=30):
+  def __init__(self, in_path, in_path_iapr, mode='train', img_size=(320, 320), sigma=30):
     super(NoisyDataset, self).__init__()
 
     self.mode = mode #train or test
@@ -28,33 +28,47 @@ class NoisyDataset(torch.utils.data.Dataset):
     self.img_dir = os.path.join(in_path, mode)
     self.imgs = os.listdir(self.img_dir)
     self.sigma = sigma
+    self.imgs_path = list()
+    for i in self.imgs:
+      self.imgs_path.append(os.path.join(self.img_dir, i))
+    
+    self.in_path_iapr = in_path_iapr # ./iaprtc12/images
+    #self.img_dir_iapr = os.path.join(in_path_iapr, mode)
+    #self.imgs_iapr = os.listdir(self.img_dir_iapr)
+    #for i in self.imgs_iapr:
+    #  self.imgs_path.append(os.path.join(self.img_dir_iapr, i))
+
+    #listOfFiles = list()
+    for (dirpath, dirnames, filenames) in os.walk(self.in_path_iapr):
+      self.imgs_path += [os.path.join(dirpath, file) for file in filenames]
+    print(self.imgs_path)
 
   def __len__(self):
-      return len(self.imgs)
+    return len(self.imgs_path)
   
   def __repr__(self):
-      return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
+    return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
     
   def __getitem__(self, idx):
-
-      img_path = os.path.join(self.img_dir, self.imgs[idx])
-      clean_img = Image.open(img_path).convert('RGB')
-      left = np.random.randint(clean_img.size[0] - self.img_size[0])
-      top = np.random.randint(clean_img.size[1] - self.img_size[1])
-      # .crop(left, upper, right, lower)
-      cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
-      transform = tv.transforms.Compose([tv.transforms.ToTensor(),
-                                        tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-      ground_truth = transform(cropped_clean)
-      noisy = addNoise(ground_truth, device)
-      return noisy, ground_truth
+    #img_path = os.path.join(self.img_dir, self.imgs[idx])
+    img_path = imgs_path[idx]
+    clean_img = Image.open(img_path).convert('RGB')
+    left = np.random.randint(clean_img.size[0] - self.img_size[0])
+    top = np.random.randint(clean_img.size[1] - self.img_size[1])
+    # .crop(left, upper, right, lower)
+    cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
+    transform = tv.transforms.Compose([tv.transforms.ToTensor(),
+                                    tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    ground_truth = transform(cropped_clean)
+    noisy = addNoise(ground_truth, device)
+    return noisy, ground_truth
 
   def named_parameters(self, recurse=True):
-        nps = nn.Module.named_parameters(self)
-        for name, param in nps:
-            if not param.requires_grad:
-                continue
-            yield name, param
+    nps = nn.Module.named_parameters(self)
+    for name, param in nps:
+        if not param.requires_grad:
+            continue
+        yield name, param
 
 class NoisyDatasetUnsup(torch.utils.data.Dataset):
   def __init__(self, in_path, mode='train', img_size=(320, 320), sigma=30):
@@ -91,10 +105,3 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
       ground_truth = transform(cropped_clean)
       noisy = addNoise(ground_truth, device)
       return noisy, ground_truth
-
-  def named_parameters(self, recurse=True):
-        nps = nn.Module.named_parameters(self)
-        for name, param in nps:
-            if not param.requires_grad:
-                continue
-            yield name, param

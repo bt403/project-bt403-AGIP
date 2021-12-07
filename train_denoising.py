@@ -13,6 +13,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 args = get_parser().parse_args()
 
 denoise_model = FFDNet(3,3,96,15).to(device)
+tcr = TCR().to(device)
 optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
 criterion_mse = nn.MSELoss().to(device)
 criterion_l1Loss = nn.L1Loss().to(device)
@@ -20,7 +21,7 @@ criterion_l1Loss = nn.L1Loss().to(device)
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
-#validationloader = dataLoaderDenoising.get_validationloader()
+
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
     if (with_tcr):
@@ -43,8 +44,6 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     if with_tcr:
         return (running_loss, loss_tcr)
     return running_loss
-
-tcr = TCR().to(device)
 
 if args.with_tcr > 0:
     for epoch in range(args.epochs):   
