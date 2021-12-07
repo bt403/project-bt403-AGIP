@@ -24,7 +24,7 @@ trainloader_un = dataLoaderDenoising.get_trainloader_un()
 
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     b_size = data_sup[0].shape[0]
-    print(b_size)
+    #print(b_size)
     input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
     if (with_tcr):
         input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
