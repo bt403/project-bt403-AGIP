@@ -12,7 +12,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 args = get_parser().parse_args()
 
 denoise_model = FFDNet(3,3,96,15)
-denoise_model.load_state_dict(torch.load(args.model_path))
+denoise_model.load_state_dict(torch.load(args.model_checkpoint))
 denoise_model.to(device)
 denoise_model.eval()
 

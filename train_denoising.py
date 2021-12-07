@@ -25,7 +25,6 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
     if (with_tcr):
         input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
-    
     optimizer.zero_grad()
     outputs = denoise_model(input)
     loss = criterion_mse(outputs,target)
@@ -54,8 +53,7 @@ if args.with_tcr > 0:
         for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
             running_loss, loss_tcr = train(data_sup, data_un, denoise_model, running_loss, args.with_tcr)
         if (epoch%10 == 0):
-            torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
-
+            torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_with_tcr_" + str(epoch+1)+ ".pt")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] total loss: %.3f' % (epoch + 1, running_loss ))     
         print('tcr loss: %.3f' % (loss_tcr))     
@@ -66,10 +64,8 @@ else:
         for iteration, data_sup in enumerate(tqdm(trainloader, total=total_iter)):
             running_loss = train(data_sup, None, denoise_model, running_loss, args.with_tcr)
         if ((epoch+1)%10 == 0):
-            torch.save(denoise_model.state_dict(), "model_checkpoint_" + str(epoch+1)+ ".pt")
-
+            torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_" + str(epoch+1)+ ".pt")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
-        print('[%d] loss: %.3f' %
-                    (epoch + 1, running_loss ))   
+        print('[%d] loss: %.3f' % (epoch + 1, running_loss ))   
 
 print('Finished Training')
