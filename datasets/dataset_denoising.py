@@ -53,9 +53,6 @@ class NoisyDataset(torch.utils.data.Dataset):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])
     img_path = self.imgs_path[idx]
     clean_img = Image.open(img_path).convert('RGB')
-    print(img_path)
-    print(clean_img.size)
-    print("-----")
     if (clean_img.size[0] > self.img_size[0]):
         left = np.random.randint(clean_img.size[0] - self.img_size[0])
     else:
