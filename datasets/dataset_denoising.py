@@ -103,7 +103,6 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
   def __getitem__(self, idx):
       #img_path = os.path.join(self.img_dir, self.imgs[idx])
       img_path = self.imgs_path[idx]
-      print(img_path)
       clean_img = Image.open(img_path).convert('RGB')
       left = np.random.randint(clean_img.size[0] - self.img_size[0])
       top = np.random.randint(clean_img.size[1] - self.img_size[1])
