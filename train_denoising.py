@@ -12,7 +12,7 @@ from time import sleep
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 args = get_parser().parse_args()
 
-denoise_model = FFDNet(3,3,96,15, args.batch_size).to(device)
+denoise_model = FFDNet(3,3,96,15).to(device)
 tcr = TCR().to(device)
 optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
 criterion_mse = nn.MSELoss().to(device)
@@ -27,13 +27,13 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     if (with_tcr):
         input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
     optimizer.zero_grad()
-    outputs = denoise_model(input)
+    outputs = denoise_model(input, b_size=args.batch_size)
     loss = criterion_mse(outputs,target)
     if with_tcr:
         bs=  input_un.shape[0]
         random=torch.rand((bs, 1))
         transformed_input= tcr(input_un,random.to(device))
-        loss_tcr= criterion_mse(denoise_model(transformed_input), tcr(denoise_model(input_un),random))
+        loss_tcr= criterion_mse(denoise_model(transformed_input, b_size=args.batch_size), tcr(denoise_model(input_un, b_size=args.batch_size),random))
         total_loss= loss + args.weight_tcr*loss_tcr
     else:
         total_loss= loss
