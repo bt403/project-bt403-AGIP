@@ -69,15 +69,9 @@ class NoisyDataset(torch.utils.data.Dataset):
     noisy = addNoise(ground_truth, device)
     return noisy, ground_truth
 
-  def named_parameters(self, recurse=True):
-    nps = nn.Module.named_parameters(self)
-    for name, param in nps:
-        if not param.requires_grad:
-            continue
-        yield name, param
 
 class NoisyDatasetUnsup(torch.utils.data.Dataset):
-  def __init__(self, in_path, mode='train', img_size=(320, 320), sigma=30):
+  def __init__(self, in_path, in_path_coco, mode='train', img_size=(320, 320), sigma=30):
     super(NoisyDatasetUnsup, self).__init__()
 
     self.mode = mode #train or test
@@ -91,16 +85,23 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
       self.imgs[i] = os.path.join(n, "GT_SRGB_010.PNG")
       i = i+1
     self.sigma = sigma
-    
+
+    self.imgs_path = list()
+    for i in self.imgs:
+      self.imgs_path.append(os.path.join(self.img_dir, i))
+
+    self.in_path_coco = in_path_coco # ./unlabeled2017
+    self.imgs_path += [f for f in os.listdir(self.in_path_coco ) if os.isfile(os.path.join(self.in_path_coco , f))]
+
   def __len__(self):
-      return len(self.imgs)
+      return len(self.imgs_path)
   
   def __repr__(self):
       return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
     
   def __getitem__(self, idx):
-
-      img_path = os.path.join(self.img_dir, self.imgs[idx])
+      #img_path = os.path.join(self.img_dir, self.imgs[idx])
+      img_path = self.imgs_path[idx]
       clean_img = Image.open(img_path).convert('RGB')
       left = np.random.randint(clean_img.size[0] - self.img_size[0])
       top = np.random.randint(clean_img.size[1] - self.img_size[1])
