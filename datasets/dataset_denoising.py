@@ -41,7 +41,6 @@ class NoisyDataset(torch.utils.data.Dataset):
     #listOfFiles = list()
     for (dirpath, dirnames, filenames) in os.walk(self.in_path_iapr):
       self.imgs_path += [os.path.join(dirpath, file) for file in filenames]
-    print(self.imgs_path)
 
   def __len__(self):
     return len(self.imgs_path)
@@ -75,7 +74,7 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
     super(NoisyDatasetUnsup, self).__init__()
 
     self.mode = mode #train or test
-    self.in_path = in_path # ./BSDS300/images
+    self.in_path = in_path #
     self.img_size = img_size # (180, 180)
 
     self.img_dir = os.path.join(in_path, "Data")
@@ -93,6 +92,8 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
     self.in_path_coco = in_path_coco # ./unlabeled2017
     self.imgs_path += [f for f in os.listdir(self.in_path_coco ) if os.path.isfile(os.path.join(self.in_path_coco , f))]
 
+    print(self.imgs_path)
+    
   def __len__(self):
       return len(self.imgs_path)
   
