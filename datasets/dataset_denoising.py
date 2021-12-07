@@ -93,21 +93,28 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
     self.imgs_path += [self.in_path_coco + "/" + f for f in os.listdir(self.in_path_coco ) if os.path.isfile(os.path.join(self.in_path_coco , f))]
 
   def __len__(self):
-      return len(self.imgs_path)
+    return len(self.imgs_path)
   
   def __repr__(self):
-      return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
+    return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
     
   def __getitem__(self, idx):
-      #img_path = os.path.join(self.img_dir, self.imgs[idx])
-      img_path = self.imgs_path[idx]
-      clean_img = Image.open(img_path).convert('RGB')
-      left = np.random.randint(clean_img.size[0] - self.img_size[0])
-      top = np.random.randint(clean_img.size[1] - self.img_size[1])
-      # .crop(left, upper, right, lower)
-      cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
-      transform = tv.transforms.Compose([tv.transforms.ToTensor(),
-                                        tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-      ground_truth = transform(cropped_clean)
-      noisy = addNoise(ground_truth, device)
-      return noisy, ground_truth
+    #img_path = os.path.join(self.img_dir, self.imgs[idx])
+    img_path = self.imgs_path[idx]
+    clean_img = Image.open(img_path).convert('RGB')
+
+    if (clean_img.size[0] > self.img_size[0]):
+        left = np.random.randint(clean_img.size[0] - self.img_size[0])
+    else:
+        left = 0
+    if (clean_img.size[1] > self.img_size[1]):
+        top = np.random.randint(clean_img.size[1] - self.img_size[1])
+    else:
+        top = 0
+    # .crop(left, upper, right, lower)
+    cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
+    transform = tv.transforms.Compose([tv.transforms.ToTensor(),
+                                    tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    ground_truth = transform(cropped_clean)
+    noisy = addNoise(ground_truth, device)
+    return noisy, ground_truth
