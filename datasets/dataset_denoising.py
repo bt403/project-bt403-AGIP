@@ -18,23 +18,32 @@ def addNoise(x, device):
     return x + (torch.randn(x.shape) * noiseLevel)
 
 class NoisyDataset(torch.utils.data.Dataset):
-  def __init__(self, in_path, in_path_iapr, mode='train', img_size=(320, 320), sigma=30):
+  def __init__(self, in_path_data_1, in_path_data_2, in_path_data_3, mode='train', img_size=(320, 320), sigma=30):
     super(NoisyDataset, self).__init__()
 
     self.mode = mode #train or test
-    self.in_path = in_path # ./BSDS300/images
+    self.in_path_data_1 = in_path_data_1 # ./BSDS300/images
+    self.in_path_data_2 = in_path_data_2 # ./BSDS300/images
+    self.in_path_data_3 = in_path_data_3 # ./BSDS300/images
     self.img_size = img_size # (180, 180)
 
-    self.img_dir = os.path.join(in_path, mode)
-    self.imgs = os.listdir(self.img_dir)
-    self.sigma = sigma
+    self.imgs_data_1 = os.listdir(self.in_path_data_1)
+    self.imgs_data_2 = os.listdir(self.in_path_data_2)
+    self.imgs_data_3 = os.listdir(self.in_path_data_3)
+    #self.sigma = sigma
     self.imgs_path = list()
-    for i in self.imgs:
-      self.imgs_path.append(os.path.join(self.img_dir, i))
-    
-    self.in_path_iapr = in_path_iapr # ./iaprtc12/images
-    for (dirpath, dirnames, filenames) in os.walk(self.in_path_iapr):
-      self.imgs_path += [os.path.join(dirpath, file) for file in filenames]
+    for i in self.imgs_data_1:
+      _, ext = os.path.splitext(file)
+      if ext in [".jpg", ".jpg", ".bmp"]:
+        self.imgs_path.append(os.path.join(self.in_path_data_1, i))
+    for i in self.imgs_data_2:
+      _, ext = os.path.splitext(file)
+      if ext in [".jpg", ".jpg", ".bmp"]:
+        self.imgs_path.append(os.path.join(self.in_path_data_2, i))
+    for i in self.imgs_data_3:
+      _, ext = os.path.splitext(file)
+      if ext in [".jpg", ".jpg", ".bmp"]:
+        self.imgs_path.append(os.path.join(self.in_path_data_3, i))
 
   def __len__(self):
     return len(self.imgs_path)
