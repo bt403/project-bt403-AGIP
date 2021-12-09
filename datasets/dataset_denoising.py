@@ -33,18 +33,19 @@ class NoisyDataset(torch.utils.data.Dataset):
     #self.sigma = sigma
     self.imgs_path = list()
     for i in self.imgs_data_1:
-      _, ext = os.path.splitext(file)
+      _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp"]:
         self.imgs_path.append(os.path.join(self.in_path_data_1, i))
     for i in self.imgs_data_2:
-      _, ext = os.path.splitext(file)
+      _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp"]:
         self.imgs_path.append(os.path.join(self.in_path_data_2, i))
     for i in self.imgs_data_3:
-      _, ext = os.path.splitext(file)
+      _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp"]:
         self.imgs_path.append(os.path.join(self.in_path_data_3, i))
-
+    print(len(self.imgs_path))
+    print(self.imgs_path)
   def __len__(self):
     return len(self.imgs_path)
   
