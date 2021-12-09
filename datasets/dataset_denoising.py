@@ -48,7 +48,8 @@ class NoisyDataset(torch.utils.data.Dataset):
     print(len(self.imgs_path))
     print(self.imgs_path)
   def __len__(self):
-    return len(self.imgs_path)
+    #return len(self.imgs_path)
+    return 8000*128
   
   def __getitem__(self, idx):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])

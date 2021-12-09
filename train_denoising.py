@@ -47,10 +47,9 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
         transformed_input = tcr(input_un,random.to(device))
         loss_tcr = criterion_mse(denoise_model(transformed_input, b_size=b_size_unsup), tcr(denoise_model(input_un, b_size=b_size_unsup),random))
         total_loss= loss + args.weight_tcr*loss_tcr
-        wandb.log({"train_loss": total_loss})
     else:
         total_loss= loss
-        wandb.log({"train_loss": total_loss})
+        
 
     running_loss += total_loss.item()
     total_loss.backward()
@@ -69,7 +68,8 @@ if args.with_tcr > 0:
             torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_with_tcr_" + str(epoch+1)+ ".pt")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] total loss: %.3f' % (epoch + 1, running_loss ))     
-        print('tcr loss: %.3f' % (loss_tcr))     
+        print('tcr loss: %.3f' % (loss_tcr))  
+        wandb.log({"train_loss": running_loss})   
 else:
     for epoch in range(args.epochs):   
         running_loss = 0.0
@@ -80,5 +80,6 @@ else:
             torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_" + str(epoch+1)+ ".pt")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] loss: %.3f' % (epoch + 1, running_loss ))   
+        wandb.log({"train_loss": running_loss})   
 
 print('Finished Training')
