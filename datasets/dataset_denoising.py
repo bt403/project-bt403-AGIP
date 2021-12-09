@@ -13,7 +13,8 @@ def addNoise(x, device):
     x: the data we want to add noise to
     device: the CPU or GPU that the input is located on. 
     """
-    noiseLevel = rand.choice([0, 0.1, 0.3, 0.5])
+    noiseLevel = rand.choice([0.5])
+    #noiseLevel = rand.choice([0, 0.1, 0.3, 0.5])
     #return x + normal.sample(sample_shape=torch.Size(x.shape)).to(device)
     return x + (torch.randn(x.shape) * noiseLevel)
 
