@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from pytorch_tcr import TCR
 import torch
 import torch.optim as optim
@@ -8,9 +7,19 @@ from models.FFDNet import FFDNet
 from dataloaders import DataLoaderDenoising
 from tqdm import tqdm
 from time import sleep
+import wandb
+
+
+wandb.init(project="my-test-project", entity="btafur")
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 args = get_parser().parse_args()
+
+wandb.config = {
+  "learning_rate": args.lr,
+  "epochs": args.epochs,
+  "batch_size": args.batch_size
+}
 
 denoise_model = FFDNet(3,3,96,15).to(device)
 tcr = TCR().to(device)
@@ -25,7 +34,6 @@ trainloader_un = dataLoaderDenoising.get_trainloader_un()
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     b_size = data_sup[0].shape[0]
     b_size_unsup = data_un[0].shape[0]
-    #print(b_size)
     input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
     if (with_tcr):
         input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
@@ -33,13 +41,15 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     outputs = denoise_model(input, b_size=b_size)
     loss = criterion_mse(outputs,target)
     if with_tcr:
-        bs=  input_un.shape[0]
-        random=torch.rand((bs, 1))
-        transformed_input= tcr(input_un,random.to(device))
-        loss_tcr= criterion_mse(denoise_model(transformed_input, b_size=b_size_unsup), tcr(denoise_model(input_un, b_size=b_size_unsup),random))
+        bs = input_un.shape[0]
+        random = torch.rand((bs, 1))
+        transformed_input = tcr(input_un,random.to(device))
+        loss_tcr = criterion_mse(denoise_model(transformed_input, b_size=b_size_unsup), tcr(denoise_model(input_un, b_size=b_size_unsup),random))
         total_loss= loss + args.weight_tcr*loss_tcr
+        wandb.log({"train_loss": total_loss})
     else:
         total_loss= loss
+        wandb.log({"train_loss": total_loss})
 
     running_loss += total_loss.item()
     total_loss.backward()

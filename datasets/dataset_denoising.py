@@ -33,21 +33,12 @@ class NoisyDataset(torch.utils.data.Dataset):
       self.imgs_path.append(os.path.join(self.img_dir, i))
     
     self.in_path_iapr = in_path_iapr # ./iaprtc12/images
-    #self.img_dir_iapr = os.path.join(in_path_iapr, mode)
-    #self.imgs_iapr = os.listdir(self.img_dir_iapr)
-    #for i in self.imgs_iapr:
-    #  self.imgs_path.append(os.path.join(self.img_dir_iapr, i))
-
-    #listOfFiles = list()
     for (dirpath, dirnames, filenames) in os.walk(self.in_path_iapr):
       self.imgs_path += [os.path.join(dirpath, file) for file in filenames]
 
   def __len__(self):
     return len(self.imgs_path)
   
-  def __repr__(self):
-    return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
-    
   def __getitem__(self, idx):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])
     img_path = self.imgs_path[idx]
@@ -83,7 +74,7 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
     for n in self.imgs:
       self.imgs[i] = os.path.join(n, "GT_SRGB_010.PNG")
       i = i+1
-    self.sigma = sigma
+    #self.sigma = sigma
 
     self.imgs_path = list()
     for i in self.imgs:
@@ -94,10 +85,7 @@ class NoisyDatasetUnsup(torch.utils.data.Dataset):
 
   def __len__(self):
     return len(self.imgs_path)
-  
-  def __repr__(self):
-    return "Dataset Parameters: mode={}, img_size={}, sigma={}".format(self.mode, self.img_size, self.sigma)
-    
+
   def __getitem__(self, idx):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])
     img_path = self.imgs_path[idx]
