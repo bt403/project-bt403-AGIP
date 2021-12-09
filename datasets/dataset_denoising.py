@@ -53,6 +53,7 @@ class NoisyDataset(torch.utils.data.Dataset):
   
   def __getitem__(self, idx):
     #img_path = os.path.join(self.img_dir, self.imgs[idx])
+    idx = idx%len(self.imgs_path)
     img_path = self.imgs_path[idx]
     clean_img = Image.open(img_path).convert('RGB')
     if (clean_img.size[0] > self.img_size[0]):
