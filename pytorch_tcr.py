@@ -12,10 +12,8 @@ import torch
 import numpy as np
 import kornia
 import torch.nn as nn
-import wandb
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-wandb.init(project="my-test-project", entity="btafur")
 
 class TCR(nn.Module):
     def __init__(self):
