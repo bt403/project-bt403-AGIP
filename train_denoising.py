@@ -6,7 +6,6 @@ from parsing import get_parser
 from models.FFDNet import FFDNet
 from dataloaders import DataLoaderDenoising
 from tqdm import tqdm
-from evaluate_denoising import validate
 import wandb
 
 
@@ -42,6 +41,17 @@ dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, a
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 validationloader = dataLoaderDenoising.get_validationloader()
+
+def validate():
+    avg_psnr = 0
+    with torch.no_grad():
+        for batch in validationloader:
+            input, target = batch[0].to(device), batch[1].to(device)
+            prediction = denoise_model(input, b_size=len(input))
+            mse = criterion_mse(prediction, target)
+            psnr = 10 * torch.log10(1 / mse)
+            avg_psnr += psnr
+    print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validationloader)))
 
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr, step):
     b_size = data_sup[0].shape[0]
