@@ -20,6 +20,7 @@ wandb.config = {
   "epochs": args.epochs,
   "batch_size": args.batch_size
 }
+wandb.init()
 
 denoise_model = FFDNet(3,3,96,15).to(device)
 tcr = TCR().to(device)
