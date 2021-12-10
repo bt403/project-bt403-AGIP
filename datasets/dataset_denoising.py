@@ -80,7 +80,7 @@ class NoisyDataset(torch.utils.data.Dataset):
 
 class NoisyDatasetUn(torch.utils.data.Dataset):
   def __init__(self, in_path_gt, in_path_noisy, mode='train', img_size=(320, 320), sigma=30):
-    super(NoisyDatasetUnsup, self).__init__()
+    super(NoisyDatasetUn, self).__init__()
 
     self.mode = mode #train or test
     self.in_path_gt = in_path_gt #
