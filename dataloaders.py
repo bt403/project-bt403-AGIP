@@ -17,7 +17,8 @@ class DataLoaderDenoising():
     def __init__(self, batch_size, batch_size_un, workers):
         super(DataLoaderDenoising, self).__init__()
         self.trainloader = torch.utils.data.DataLoader(NoisyDataset(dataset_dir_sup_1, dataset_dir_sup_2, dataset_dir_sup_3, 'train', (50,50)), batch_size=batch_size, shuffle=True, num_workers=workers, pin_memory=True)
-        self.trainloader_un = torch.utils.data.DataLoader(NoisyDatasetUnsup(dataset_dir_un, dataset_dir_un_coco), batch_size=batch_size_un, shuffle=True, num_workers=workers) # The batch size for unsupervised data is more than supervised data
+        self.trainloader_un = []
+        #self.trainloader_un = torch.utils.data.DataLoader(NoisyDatasetUnsup(dataset_dir_un, dataset_dir_un_coco), batch_size=batch_size_un, shuffle=True, num_workers=workers) # The batch size for unsupervised data is more than supervised data
         self.validationloader = torch.utils.data.DataLoader(NoisyDatasetUn(dataset_dir_un_1_gt, dataset_dir_un_1_noisy, mode='test', img_size=(320, 320)), batch_size=batch_size, shuffle=True, num_workers=workers)
         
     def get_trainloader(self):
