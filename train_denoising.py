@@ -51,6 +51,7 @@ def validate():
             mse = criterion_mse(prediction, target)
             psnr = 10 * torch.log10(1 / mse)
             avg_psnr += psnr
+    wandb.log({"psnr": psnr}) 
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validationloader)))
 
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr, step):
