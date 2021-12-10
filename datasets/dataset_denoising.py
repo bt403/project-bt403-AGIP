@@ -101,6 +101,8 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
         self.imgs_path_noisy.append(os.path.join(self.in_path_noisy, i))
+    print(len(self.imgs_path_gt))
+    print(self.imgs_path_gt)
 
   def __len__(self):
     return len(self.imgs_path_gt)
