@@ -24,6 +24,16 @@ wandb.config = {
 denoise_model = FFDNet(3,3,96,15).to(device)
 tcr = TCR().to(device)
 optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
+
+if (args.resume > 0):
+    checkpoint = torch.load(args.checkpoint)
+    denoise_model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+
+denoise_model.train()
+
 criterion_mse = nn.MSELoss().to(device)
 criterion_l1Loss = nn.L1Loss().to(device)
 
@@ -76,8 +86,14 @@ else:
         total_iter = len(trainloader)
         for iteration, data_sup in enumerate(tqdm(trainloader, total=total_iter)):
             running_loss = train(data_sup, None, denoise_model, running_loss, args.with_tcr)
-        if ((epoch+1)%10 == 0):
+        if ((epoch+1)%2 == 0):
             torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_" + str(epoch+1)+ ".pt")
+            torch.save({
+            'epoch': epoch,
+            'model_state_dict': denoise_model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': running_loss,
+            }, "./checkpoint/denoise_checkpoint_resume_" + str(epoch+1)+ ".tar")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] loss: %.3f' % (epoch + 1, running_loss ))   
         wandb.log({"train_loss": running_loss})   
