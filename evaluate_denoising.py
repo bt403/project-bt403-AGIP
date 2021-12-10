@@ -16,7 +16,7 @@ denoise_model.load_state_dict(torch.load(args.checkpoint))
 denoise_model.to(device)
 denoise_model.eval()
 
-dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.workers)
+dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
 validationloader = dataLoaderDenoising.get_validationloader()
 criterion_mse = nn.MSELoss().to(device)
 
