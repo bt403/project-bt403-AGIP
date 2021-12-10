@@ -44,17 +44,17 @@ trainloader_un = dataLoaderDenoising.get_trainloader_un()
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
    
     b_size = data_sup[0].shape[0]
-    input, target = data_sup[0].to(device), data_sup[1].to(device)   # Here the data is used in supervised fashion
+    input, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
     if (with_tcr):
         b_size_unsup = data_un[0].shape[0]
-        input_un, target_un = data_un[0].to(device), data_un[1].to(device)   # Here the labels are not used
+        input_un, target_un = data_un[0].to('cuda:0', non_blocking=True), data_un[1].to('cuda:0', non_blocking=True)  # Here the labels are not used
     optimizer.zero_grad()
     outputs = denoise_model(input, b_size=b_size)
     loss = criterion_mse(outputs,target)
     if with_tcr:
         bs = input_un.shape[0]
         random = torch.rand((bs, 1))
-        transformed_input = tcr(input_un,random.to(device))
+        transformed_input = tcr(input_un,random.to('cuda:0', non_blocking=True))
         loss_tcr = criterion_mse(denoise_model(transformed_input, b_size=b_size_unsup), tcr(denoise_model(input_un, b_size=b_size_unsup),random))
         total_loss= loss + args.weight_tcr*loss_tcr
     else:
