@@ -13,6 +13,7 @@ import wandb
 wandb.init(project="my-test-project", entity="btafur")
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+print(device)
 args = get_parser().parse_args()
 
 wandb.config = {
@@ -42,7 +43,6 @@ trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 
 def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
-   
     b_size = data_sup[0].shape[0]
     input, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
     if (with_tcr):
@@ -51,6 +51,8 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     optimizer.zero_grad()
     outputs = denoise_model(input, b_size=b_size)
     loss = criterion_mse(outputs,target)
+    if (epoch+1)%500:
+        wandb.log({"train_loss": loss}) 
     if with_tcr:
         bs = input_un.shape[0]
         random = torch.rand((bs, 1))
@@ -79,7 +81,7 @@ if args.with_tcr > 0:
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] total loss: %.3f' % (epoch + 1, running_loss ))     
         print('tcr loss: %.3f' % (loss_tcr))  
-        wandb.log({"train_loss": running_loss})   
+        #wandb.log({"train_loss": running_loss})   
 else:
     for epoch in range(args.epochs):   
         running_loss = 0.0
@@ -96,6 +98,6 @@ else:
             }, "./checkpoint/denoise_checkpoint_resume_" + str(epoch+1)+ ".tar")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] loss: %.3f' % (epoch + 1, running_loss ))   
-        wandb.log({"train_loss": running_loss})   
+        #wandb.log({"train_loss": running_loss})   
 
 print('Finished Training')
