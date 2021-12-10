@@ -51,7 +51,7 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     optimizer.zero_grad()
     outputs = denoise_model(input, b_size=b_size)
     loss = criterion_mse(outputs,target)
-    if (epoch+1)%500:
+    if (epoch+1)%200==0:
         wandb.log({"train_loss": loss}) 
     if with_tcr:
         bs = input_un.shape[0]
