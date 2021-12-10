@@ -10,7 +10,7 @@ dataset_dir_un_coco = "./unlabeled2017"
 dataset_dir_sup_1 = "./BBSDS500/train"
 dataset_dir_sup_2 = "./exploration_database"
 dataset_dir_sup_3 = "./imagenet-400"
-dataset_dir_un_1_gt = "./CBSD68/original_png"
+dataset_dir_un_1_gt = "./CBSD68/original_png/original_png"
 dataset_dir_un_1_noisy = "./CBSD68/noisy50"
 
 class DataLoaderDenoising():
