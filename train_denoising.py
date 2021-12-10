@@ -42,7 +42,7 @@ dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, a
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 
-def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
+def train(data_sup, data_un, denoise_model, running_loss, with_tcr, step):
     b_size = data_sup[0].shape[0]
     input, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
     if (with_tcr):
@@ -51,7 +51,7 @@ def train(data_sup, data_un, denoise_model, running_loss, with_tcr):
     optimizer.zero_grad()
     outputs = denoise_model(input, b_size=b_size)
     loss = criterion_mse(outputs,target)
-    if (epoch+1)%200==0:
+    if ((step+1)%200==0):
         wandb.log({"train_loss": loss}) 
     if with_tcr:
         bs = input_un.shape[0]
@@ -74,8 +74,10 @@ if args.with_tcr > 0:
     for epoch in range(args.epochs):   
         running_loss = 0.0
         total_iter = min(len(trainloader), len(trainloader_un))
+        step_log = 0
         for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
-            running_loss, loss_tcr = train(data_sup, data_un, denoise_model, running_loss, args.with_tcr)
+            running_loss, loss_tcr = train(data_sup, data_un, denoise_model, running_loss, args.with_tcr, step_log)
+            step_log += 1
         if ((epoch+1)%10 == 0):
             torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_with_tcr_" + str(epoch+1)+ ".pt")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
@@ -86,8 +88,10 @@ else:
     for epoch in range(args.epochs):   
         running_loss = 0.0
         total_iter = len(trainloader)
+        step_log = 0
         for iteration, data_sup in enumerate(tqdm(trainloader, total=total_iter)):
-            running_loss = train(data_sup, None, denoise_model, running_loss, args.with_tcr)
+            running_loss = train(data_sup, None, denoise_model, running_loss, args.with_tcr, step_log)
+            step_log += 1
         if ((epoch+1)%2 == 0):
             torch.save(denoise_model.state_dict(), "./checkpoint/denoise_checkpoint_" + str(epoch+1)+ ".pt")
             torch.save({
