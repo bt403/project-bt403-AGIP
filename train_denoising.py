@@ -10,7 +10,7 @@ import math
 import numpy as np
 from torch.autograd import Variable
 import wandb
-from skimage.measure.simple_metrics import compare_psnr
+from skimage.metrics import peak_signal_noise_ratio
 
 wandb.init(project="my-test-project", entity="btafur")
 
@@ -84,7 +84,7 @@ def batch_psnr(img, imclean, data_range):
 	imgclean = imclean.data.cpu().numpy().astype(np.float32)
 	psnr = 0
 	for i in range(img_cpu.shape[0]):
-		psnr += compare_psnr(imgclean[i, :, :, :], img_cpu[i, :, :, :], \
+		psnr += peak_signal_noise_ratio(imgclean[i, :, :, :], img_cpu[i, :, :, :], \
 					   data_range=data_range)
 	return psnr/img_cpu.shape[0]
 
