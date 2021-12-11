@@ -66,7 +66,7 @@ dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, a
 trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 validationloader = dataLoaderDenoising.get_validationloader()
-val_noiseL = 50
+val_noiseL = 50.0
 
 def validate():
     avg_psnr = 0

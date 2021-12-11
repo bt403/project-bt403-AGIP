@@ -16,43 +16,44 @@ import torch
 from torch.autograd import Function, Variable
 
 def concatenate_input_noise_map(input, noise_sigma):
-	r"""Implements the first layer of FFDNet. This function returns a
-	torch.autograd.Variable composed of the concatenation of the downsampled
-	input image and the noise map. Each image of the batch of size CxHxW gets
-	converted to an array of size 4*CxH/2xW/2. Each of the pixels of the
-	non-overlapped 2x2 patches of the input image are placed in the new array
-	along the first dimension.
+    r"""Implements the first layer of FFDNet. This function returns a
+    torch.autograd.Variable composed of the concatenation of the downsampled
+    input image and the noise map. Each image of the batch of size CxHxW gets
+    converted to an array of size 4*CxH/2xW/2. Each of the pixels of the
+    non-overlapped 2x2 patches of the input image are placed in the new array
+    along the first dimension.
 
-	Args:
-		input: batch containing CxHxW images
-		noise_sigma: the value of the pixels of the CxH/2xW/2 noise map
-	"""
-	# noise_sigma is a list of length batch_size
-	N, C, H, W = input.size()
-	dtype = input.type()
-	sca = 2
-	sca2 = sca*sca
-	Cout = sca2*C
-	Hout = H//sca
-	Wout = W//sca
-	idxL = [[0, 0], [0, 1], [1, 0], [1, 1]]
-
-	# Fill the downsampled image with zeros
-	if 'cuda' in dtype:
-		downsampledfeatures = torch.cuda.FloatTensor(N, Cout, Hout, Wout).fill_(0)
-	else:
-		downsampledfeatures = torch.FloatTensor(N, Cout, Hout, Wout).fill_(0)
+    Args:
+        input: batch containing CxHxW images
+        noise_sigma: the value of the pixels of the CxH/2xW/2 noise map
+    """
+    # noise_sigma is a list of length batch_size
+    print(input.size())
+    N, C, H, W = input.size()
+    dtype = input.type()
+    sca = 2
+    sca2 = sca*sca
+    Cout = sca2*C
+    Hout = H//sca
+    Wout = W//sca
+    idxL = [[0, 0], [0, 1], [1, 0], [1, 1]]
+    
+    # Fill the downsampled image with zeros
+    if 'cuda' in dtype:
+        downsampledfeatures = torch.cuda.FloatTensor(N, Cout, Hout, Wout).fill_(0)
+    else:
+        downsampledfeatures = torch.FloatTensor(N, Cout, Hout, Wout).fill_(0)
 
 	# Build the CxH/2xW/2 noise map
-	noise_map = noise_sigma.view(N, 1, 1, 1).repeat(1, C, Hout, Wout)
+    noise_map = noise_sigma.view(N, 1, 1, 1).repeat(1, C, Hout, Wout)
 
 	# Populate output
-	for idx in range(sca2):
-		downsampledfeatures[:, idx:Cout:sca2, :, :] = \
+    for idx in range(sca2):
+        downsampledfeatures[:, idx:Cout:sca2, :, :] = \
 			input[:, :, idxL[idx][0]::sca, idxL[idx][1]::sca]
 
 	# concatenate de-interleaved mosaic with noise map
-	return torch.cat((noise_map, downsampledfeatures), 1)
+    return torch.cat((noise_map, downsampledfeatures), 1)
 
 class UpSampleFeaturesFunction(Function):
 	r"""Extends PyTorch's modules by implementing a torch.autograd.Function.

@@ -129,9 +129,8 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     transform = tv.transforms.Compose([tv.transforms.ToTensor(),
                                     tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     ground_truth = transform(cropped_clean)
-    noisy = transform(cropped_noisy)
-    #noisy = addNoise(ground_truth)
-    return noisy, ground_truth
+    #noisy = transform(cropped_noisy)
+    return ground_truth, ground_truth
 
 
 
