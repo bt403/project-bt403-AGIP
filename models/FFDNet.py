@@ -28,7 +28,6 @@ def concatenate_input_noise_map(input, noise_sigma):
         noise_sigma: the value of the pixels of the CxH/2xW/2 noise map
     """
     # noise_sigma is a list of length batch_size
-    print(input.size())
     N, C, H, W = input.size()
     dtype = input.type()
     sca = 2
@@ -45,8 +44,6 @@ def concatenate_input_noise_map(input, noise_sigma):
         downsampledfeatures = torch.FloatTensor(N, Cout, Hout, Wout).fill_(0)
 
 	# Build the CxH/2xW/2 noise map
-    print("Shape____")
-    print(noise_sigma.shape)
     noise_map = noise_sigma.view(N, 1, 1, 1).repeat(1, C, Hout, Wout)
 
 	# Populate output
