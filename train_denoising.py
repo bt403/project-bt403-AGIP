@@ -73,7 +73,7 @@ def validate():
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
-            img_val = torch.unsqueeze(input, 0)
+            img_val = input
             noise = torch.FloatTensor(img_val.size()).normal_(mean=0, std=val_noiseL)
             imgn_val = img_val + noise.to(device)
             img_val, imgn_val = Variable(img_val.cuda()), Variable(imgn_val.cuda())
