@@ -91,7 +91,7 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         b_size_unsup = data_un[0].shape[0]
         input_un, target_un = data_un[0].to('cuda:0', non_blocking=True), data_un[1].to('cuda:0', non_blocking=True)  # Here the labels are not used
     optimizer.zero_grad()
-    outputs = denoise_model_p(input, b_size=b_size)
+    #outputs = denoise_model_p(input, b_size=b_size)
 
     #input = data
     noise = torch.zeros(input.size())
