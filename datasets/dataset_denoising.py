@@ -6,7 +6,6 @@ import torchvision as tv
 import random as rand
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-
 def addNoise(x, sigma=None): 
     """
     We will use this helper function to add noise to some data. 

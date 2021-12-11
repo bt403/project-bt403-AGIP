@@ -10,6 +10,7 @@ import math
 import numpy as np
 from torch.autograd import Variable
 import wandb
+from skimage.measure.simple_metrics import compare_psnr
 
 wandb.init(project="my-test-project", entity="btafur")
 
@@ -68,6 +69,25 @@ trainloader_un = dataLoaderDenoising.get_trainloader_un()
 validationloader = dataLoaderDenoising.get_validationloader()
 val_noiseL = 50.0
 
+def batch_psnr(img, imclean, data_range):
+	r"""
+	Computes the PSNR along the batch dimension (not pixel-wise)
+
+	Args:
+		img: a `torch.Tensor` containing the restored image
+		imclean: a `torch.Tensor` containing the reference image
+		data_range: The data range of the input image (distance between
+			minimum and maximum possible values). By default, this is estimated
+			from the image data-type.
+	"""
+	img_cpu = img.data.cpu().numpy().astype(np.float32)
+	imgclean = imclean.data.cpu().numpy().astype(np.float32)
+	psnr = 0
+	for i in range(img_cpu.shape[0]):
+		psnr += compare_psnr(imgclean[i, :, :, :], img_cpu[i, :, :, :], \
+					   data_range=data_range)
+	return psnr/img_cpu.shape[0]
+
 def validate():
     avg_psnr = 0
     with torch.no_grad():
@@ -79,10 +99,8 @@ def validate():
             img_val, imgn_val = Variable(img_val.cuda()), Variable(imgn_val.cuda())
             sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
             out_val = torch.clamp(imgn_val-denoise_model_p(imgn_val, sigma_noise), 0., 1.)
-            mse = criterion_mse(out_val, target)
-            psnr = 10 * torch.log10(1 / mse)
-            avg_psnr += psnr
-    wandb.log({"psnr": psnr}) 
+            avg_psnr += batch_psnr(out_val, img_val, 1.)
+    wandb.log({"psnr": avg_psnr / len(validationloader)}) 
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validationloader)))
 
 def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
