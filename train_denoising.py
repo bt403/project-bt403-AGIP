@@ -75,7 +75,7 @@ def validate():
             input, target = batch[0].to(device), batch[1].to(device)
             img_val = torch.unsqueeze(input, 0)
             noise = torch.FloatTensor(img_val.size()).normal_(mean=0, std=val_noiseL)
-            imgn_val = img_val + noise
+            imgn_val = img_val + noise.to(device)
             img_val, imgn_val = Variable(img_val.cuda()), Variable(imgn_val.cuda())
             sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
             out_val = torch.clamp(imgn_val-denoise_model_p(imgn_val, sigma_noise), 0., 1.)
