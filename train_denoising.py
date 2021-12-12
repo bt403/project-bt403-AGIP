@@ -61,7 +61,7 @@ if (args.resume > 0):
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
 
-denoise_model_p.train()
+
 
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
 trainloader = dataLoaderDenoising.get_trainloader()
@@ -90,6 +90,7 @@ def batch_psnr(img, imclean, data_range):
 
 def validate():
     avg_psnr = 0
+    
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
@@ -104,6 +105,7 @@ def validate():
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validationloader)))
 
 def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
+    denoise_model_p.train()
     b_size = data_sup[0].shape[0]
     input, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
     if (with_tcr):
@@ -141,7 +143,13 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     else:
         total_loss= loss
     
+    out_train = torch.clamp(imgn_train-denoise_model_p(imgn_train, stdn_var), 0., 1.)
+    psnr_train = batch_psnr(out_train, input, 1.)
+    print("PSNR Train: " + str(psnr_train))
+    print("loss: ", str(loss))
+
     if ((step+1)%500==0):
+        denoise_model_p.eval()
         validate()
         wandb.log({"train_loss": total_loss}) 
 
