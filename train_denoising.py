@@ -110,26 +110,21 @@ def validate():
 
 def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     denoise_model_p.train()
-    b_size = data_sup[0].shape[0]
-    input, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
-    if (with_tcr):
-        b_size_unsup = data_un[0].shape[0]
-        input_un, target_un = data_un[0].to('cuda:0', non_blocking=True), data_un[1].to('cuda:0', non_blocking=True)  # Here the labels are not used
+    denoise_model_p.zero_grad()
     optimizer.zero_grad()
-    #outputs = denoise_model_p(input, b_size=b_size)
 
-    #input = data
-    noise = torch.zeros(input.size())
+    img_train, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
     
+    noise = torch.zeros(img_train.size())
     stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
                     size=noise.size()[0])
     for nx in range(noise.size()[0]):
         sizen = noise[0, :, :, :].size()
         noise[nx, :, :, :] = torch.FloatTensor(sizen).\
                             normal_(mean=0, std=stdn[nx])
-    imgn_train = input + noise.to(device)
+    imgn_train = img_train + noise
     # Create input Variables
-    input = Variable(input.cuda())
+    img_train = Variable(img_train.cuda())
     imgn_train = Variable(imgn_train.cuda())
     noise = Variable(noise.cuda())
     stdn_var = Variable(torch.cuda.FloatTensor(stdn))
@@ -137,30 +132,20 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     # Evaluate model and optimize it
     out_train = denoise_model_p(imgn_train, stdn_var)
     loss = criterion_mse(out_train, noise) / (imgn_train.size()[0]*2)
-    
-    if with_tcr:
-        bs = input_un.shape[0]
-        random = torch.rand((bs, 1))
-        transformed_input = tcr(input_un,random.to('cuda:0', non_blocking=True))
-        loss_tcr = criterion_mse(denoise_model_p(transformed_input, b_size=b_size_unsup), tcr(denoise_model_p(input_un, b_size=b_size_unsup),random))
-        total_loss= loss + args.weight_tcr*loss_tcr
-    else:
-        total_loss= loss
-
-    running_loss += total_loss.item()
-    total_loss.backward()
+    loss.backward()
     optimizer.step()
+    running_loss += loss
     if with_tcr:
         return (running_loss, loss_tcr)
     
     if ((step+1)%500==0):
         denoise_model_p.eval()
         out_train = torch.clamp(imgn_train-denoise_model_p(imgn_train, stdn_var), 0., 1.)
-        psnr_train = batch_psnr(out_train, input, 1.)
+        psnr_train = batch_psnr(out_train, img_train, 1.)
         print("PSNR Train: " + str(psnr_train))
         print("loss: ", str(loss))      
         validate()
-        wandb.log({"train_loss": total_loss}) 
+        wandb.log({"train_loss": loss}) 
     return running_loss
 
 if args.with_tcr > 0:
