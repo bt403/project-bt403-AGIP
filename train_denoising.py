@@ -146,10 +146,13 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         total_loss= loss + args.weight_tcr*loss_tcr
     else:
         total_loss= loss
-    
-    
-    
 
+    running_loss += total_loss.item()
+    total_loss.backward()
+    optimizer.step()
+    if with_tcr:
+        return (running_loss, loss_tcr)
+    
     if ((step+1)%500==0):
         denoise_model_p.eval()
         out_train = torch.clamp(imgn_train-denoise_model_p(imgn_train, stdn_var), 0., 1.)
@@ -158,12 +161,6 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         print("loss: ", str(loss))      
         validate()
         wandb.log({"train_loss": total_loss}) 
-
-    running_loss += total_loss.item()
-    total_loss.backward()
-    optimizer.step()
-    if with_tcr:
-        return (running_loss, loss_tcr)
     return running_loss
 
 if args.with_tcr > 0:
