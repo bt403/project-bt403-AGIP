@@ -76,7 +76,7 @@ class NoisyDataset(torch.utils.data.Dataset):
     ground_truth = np.array(cropped_clean)
     print("__________GROUND TRUTH________")
     print(ground_truth[0])
-    ground_truth /= 255.
+    ground_truth = ground_truth / 255.
     print("__________GROUND TRUTH /255________")
     print(ground_truth[0])
     #noisy = addNoise(ground_truth)
