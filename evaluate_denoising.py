@@ -24,6 +24,7 @@ dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, a
 validationloader = dataLoaderDenoising.get_validationloader()
 criterion_mse = nn.MSELoss().to(device)
 val_noiseL = 50
+val_noiseL /= 255.
 sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
 
 def validate():
@@ -31,8 +32,7 @@ def validate():
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
-            noise = torch.FloatTensor(img_val.size()).normal_(mean=0, std=val_noiseL)
-            imgn_val = input + noise.to(device)
+            imgn_val = input + sigma_noise.to(device)
             img_val, imgn_val = Variable(input.cuda()), Variable(imgn_val.cuda())
             sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
             out_val = torch.clamp(imgn_val-denoise_model_p(imgn_val, sigma_noise), 0., 1.)
