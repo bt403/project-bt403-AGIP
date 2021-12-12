@@ -47,8 +47,7 @@ class NoisyDataset(torch.utils.data.Dataset):
       _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
         self.imgs_path.append(os.path.join(self.in_path_data_3, i))
-    print(len(self.imgs_path))
-    print(self.imgs_path)
+
   def __len__(self):
     #return len(self.imgs_path)
     return 8000*128
@@ -71,9 +70,14 @@ class NoisyDataset(torch.utils.data.Dataset):
    
     transform = tv.transforms.Compose([
                                     tv.transforms.RandomHorizontalFlip(p=0.5),
-                                    tv.transforms.ToTensor(),])
+                                    #tv.transforms.ToTensor(),
+                                    ])
     ground_truth = transform(cropped_clean)
+    print("__________GROUND TRUTH________")
+    print(ground_truth)
     ground_truth /= 255.
+    print("__________GROUND TRUTH /255________")
+    print(ground_truth)
     #noisy = addNoise(ground_truth)
     noisy = ground_truth
     return noisy, ground_truth
@@ -102,8 +106,7 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
         self.imgs_path_noisy.append(os.path.join(self.in_path_noisy, i))
-    print(len(self.imgs_path_gt))
-    print(self.imgs_path_gt)
+
 
   def __len__(self):
     return len(self.imgs_path_gt)
@@ -126,10 +129,11 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     # .crop(left, upper, right, lower)
     cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
     cropped_noisy = noisy_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
-    transform = tv.transforms.Compose([tv.transforms.ToTensor(),])
-    ground_truth = transform(cropped_clean)
+    #transform = tv.transforms.Compose([tv.transforms.ToTensor(),])
+    ground_truth = np.array(cropped_clean)
     ground_truth /= 255.
-    #noisy = transform(cropped_noisy)
+    noisy = np.array(cropped_noisy)
+    noisy /= 255.
     return ground_truth, ground_truth
 
 
