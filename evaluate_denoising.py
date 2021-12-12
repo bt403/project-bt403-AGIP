@@ -23,7 +23,7 @@ denoise_model_p.eval()
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
 validationloader = dataLoaderDenoising.get_validationloader()
 criterion_mse = nn.MSELoss().to(device)
-val_noiseL = 50
+val_noiseL = 25
 val_noiseL /= 255.
 sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
 
