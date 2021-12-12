@@ -122,7 +122,7 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         sizen = noise[0, :, :, :].size()
         noise[nx, :, :, :] = torch.FloatTensor(sizen).\
                             normal_(mean=0, std=stdn[nx])
-    imgn_train = img_train + noise
+    imgn_train = img_train + noise.to(device)
     # Create input Variables
     img_train = Variable(img_train.cuda())
     imgn_train = Variable(imgn_train.cuda())
