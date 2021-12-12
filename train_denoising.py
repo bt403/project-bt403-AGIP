@@ -58,7 +58,7 @@ optimizer = torch.optim.Adam(denoise_model_p.parameters(), lr =args.lr)
 
 if (args.resume > 0):
     checkpoint = torch.load(args.checkpoint)
-    denoise_model.load_state_dict(checkpoint['model_state_dict'])
+    denoise_model_p.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
