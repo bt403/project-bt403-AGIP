@@ -46,13 +46,15 @@ def weights_init_kaiming(lyr):
 denoise_model = FFDNet(3).to(device)
 denoise_model.apply(weights_init_kaiming)
 tcr = TCR().to(device)
-optimizer = torch.optim.Adam(denoise_model.parameters(), lr =args.lr)
 
-criterion_mse = nn.MSELoss(size_average=False).to(device)
-criterion_l1Loss = nn.L1Loss().to(device)
+
 
 device_ids = [0]
 denoise_model_p = nn.DataParallel(denoise_model, device_ids=device_ids).cuda()
+
+criterion_mse = nn.MSELoss(size_average=False).to(device)
+criterion_l1Loss = nn.L1Loss().to(device)
+optimizer = torch.optim.Adam(denoise_model_p.parameters(), lr =args.lr)
 
 if (args.resume > 0):
     checkpoint = torch.load(args.checkpoint)
