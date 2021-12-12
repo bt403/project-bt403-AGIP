@@ -68,6 +68,10 @@ trainloader = dataLoaderDenoising.get_trainloader()
 trainloader_un = dataLoaderDenoising.get_trainloader_un()
 validationloader = dataLoaderDenoising.get_validationloader()
 val_noiseL = 50.0
+noiseIntL = [0, 75]
+val_noiseL /= 255.
+noiseIntL[0] /= 255.
+noiseIntL[1] /= 255.
 
 def batch_psnr(img, imclean, data_range):
 	r"""
@@ -116,7 +120,7 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
 
     #input = data
     noise = torch.zeros(input.size())
-    noiseIntL = [0, 75]
+    
     stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
                     size=noise.size()[0])
     for nx in range(noise.size()[0]):
