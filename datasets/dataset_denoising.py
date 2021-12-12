@@ -75,7 +75,7 @@ class NoisyDataset(torch.utils.data.Dataset):
     ground_truth = transform(cropped_clean)
     ground_truth = np.array(cropped_clean) / 255.
     ground_truth = tv.transforms.ToTensor()(ground_truth)
-    print(ground_truth[0])
+    #print(ground_truth[0])
     #noisy = addNoise(ground_truth)
     noisy = ground_truth
     return noisy, ground_truth
