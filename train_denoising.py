@@ -130,7 +130,7 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     imgn_train = Variable(imgn_train.cuda())
     noise = Variable(noise.cuda())
     stdn_var = Variable(torch.cuda.FloatTensor(stdn))
-
+    print(imgn_train.shape)
     # Evaluate model and optimize it
     out_train = denoise_model_p(imgn_train, stdn_var)
     loss = criterion_mse(out_train, noise) / (imgn_train.size()[0]*2)
