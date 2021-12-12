@@ -147,13 +147,15 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     else:
         total_loss= loss
     
-    out_train = torch.clamp(imgn_train-denoise_model_p(imgn_train, stdn_var), 0., 1.)
-    psnr_train = batch_psnr(out_train, input, 1.)
-    print("PSNR Train: " + str(psnr_train))
-    print("loss: ", str(loss))
+    
+    
 
     if ((step+1)%500==0):
         denoise_model_p.eval()
+        out_train = torch.clamp(imgn_train-denoise_model_p(imgn_train, stdn_var), 0., 1.)
+        psnr_train = batch_psnr(out_train, input, 1.)
+        print("PSNR Train: " + str(psnr_train))
+        print("loss: ", str(loss))      
         validate()
         wandb.log({"train_loss": total_loss}) 
 
