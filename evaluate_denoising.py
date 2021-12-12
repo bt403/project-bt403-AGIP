@@ -13,9 +13,12 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 args = get_parser().parse_args()
 
 denoise_model = FFDNet(3)
-denoise_model.load_state_dict(torch.load(args.checkpoint))
-denoise_model.to(device)
-denoise_model.eval()
+device_ids = [0]
+denoise_model_p = nn.DataParallel(denoise_model, device_ids=device_ids).cuda()
+
+denoise_model_p.load_state_dict(torch.load(args.checkpoint))
+denoise_model_p.to(device)
+denoise_model_p.eval()
 
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
 validationloader = dataLoaderDenoising.get_validationloader()
@@ -28,7 +31,7 @@ def validate():
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
-            out_val = torch.clamp(input-denoise_model(input, sigma_noise), 0., 1.)
+            out_val = torch.clamp(input-denoise_model_p(input, sigma_noise), 0., 1.)
             mse = criterion_mse(out_val, target)
             psnr = 10 * torch.log10(1 / mse)
             avg_psnr += psnr
