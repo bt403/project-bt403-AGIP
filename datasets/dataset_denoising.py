@@ -6,6 +6,7 @@ import torchvision as tv
 import random as rand
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 from sklearn.model_selection import train_test_split
+import random
 
 def get_imgs_path_train(in_path_data_1, in_path_data_2, in_path_data_3):
   imgs_data_1 = os.listdir(in_path_data_1)
@@ -107,7 +108,6 @@ class NoisyDatasetVal(torch.utils.data.Dataset):
       if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
         self.imgs_path_noisy.append(os.path.join(self.in_path_noisy, i))
 
-
   def __len__(self):
     return len(self.imgs_path_gt)
 
@@ -147,8 +147,6 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     self.imgs_path = list()
     self.img_size = img_size
 
-    
-
     for i in self.imgs:
       _, ext = os.path.splitext(i)
       if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
@@ -170,6 +168,9 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.imgs_path += self.imgs_path_train
       print("images_path total")
       print(len(self.imgs_path))
+      random.seed(2)
+      random.shuffle(self.imgs_path)
+      print(self.imgs_path)
 
   def __len__(self):
     if (self.mode == "val"):
