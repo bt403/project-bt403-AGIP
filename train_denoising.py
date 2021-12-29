@@ -155,7 +155,7 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         noise = Variable(noise.cuda())
         stdn_var_un = Variable(torch.cuda.FloatTensor(stdn))
         print("tcr first")
-        transformed_input = tcr(torch.cuda.FloatTensor(imgn_un),random.to('cuda:0', non_blocking=True))
+        transformed_input = tcr(imgn_un.type(torch.FloatTensor),random.to('cuda:0', non_blocking=True))
         imgn_un = Variable(imgn_un.cuda())
         print("tcr second")
         loss_tcr = criterion_mse(denoise_model_p(transformed_input, stdn_var_un), tcr(denoise_model_p(imgn_un, stdn_var_un),random))
