@@ -4,6 +4,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description='PyTorch TCR')
     #parser.add_argument('--upscale_factor', type=int, default=3, help="super resolution upscale factor")
     parser.add_argument('--with_tcr', type=int, default=0, help='training batch size')
+    parser.add_argument('--val_un', type=int, default=0, help='training batch size')
     parser.add_argument('--batch_size', type=int, default=10, help='training batch size')
     parser.add_argument('--batch_size_un', type=int, default=10, help='training batch size')
     #parser.add_argument('--testBatchSize', type=int, default=100, help='testing batch size')

@@ -21,7 +21,11 @@ denoise_model_p.to(device)
 denoise_model_p.eval()
 
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
+
 validationloader = dataLoaderDenoising.get_validationloader()
+if (args.val_un > 0):
+    validationloader = dataLoaderDenoising.get_validationloader_un()
+    
 criterion_mse = nn.MSELoss().to(device)
 val_noiseL = 25
 val_noiseL /= 255.
