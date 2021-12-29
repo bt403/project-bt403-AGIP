@@ -81,7 +81,7 @@ class NoisyDataset(torch.utils.data.Dataset):
     #print(ground_truth[0])
     #noisy = addNoise(ground_truth)
     #noisy = ground_truth
-    return (ground_truth)
+    return ground_truth
 
 
 class NoisyDatasetVal(torch.utils.data.Dataset):
@@ -195,4 +195,4 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     #print(ground_truth[0])
     #noisy = addNoise(ground_truth)
     #noisy = ground_truth
-    return (ground_truth)
+    return ground_truth
