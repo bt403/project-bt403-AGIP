@@ -116,7 +116,10 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     optimizer.zero_grad()
 
     img_train, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
-    
+    if (with_tcr):
+        b_size_unsup = data_un[0].shape[0]
+        img_un, target_un = data_un[0].to('cuda:0', non_blocking=True), data_un[1].to('cuda:0', non_blocking=True) 
+
     noise = torch.zeros(img_train.size())
     stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
                     size=noise.size()[0])
@@ -134,7 +137,31 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     # Evaluate model and optimize it
     out_train = denoise_model_p(imgn_train, stdn_var)
     loss = criterion_mse(out_train, noise) / (imgn_train.size()[0]*2)
-    loss.backward()
+
+    if with_tcr:
+        bs = img_un.shape[0]
+        random = torch.rand((bs, 1))
+
+        noise = torch.zeros(img_un.size())
+        stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
+                        size=noise.size()[0])
+        for nx in range(noise.size()[0]):
+            sizen = noise[0, :, :, :].size()
+            noise[nx, :, :, :] = torch.FloatTensor(sizen).\
+                                normal_(mean=0, std=stdn[nx])
+        imgn_un = img_un + noise.to(device)
+        # Create input Variables
+        img_un = Variable(img_un.cuda())
+        imgn_un = Variable(imgn_un.cuda())
+        noise = Variable(noise.cuda())
+        stdn_var_un = Variable(torch.cuda.FloatTensor(stdn))
+        transformed_input = tcr(imgn_un,random.to('cuda:0', non_blocking=True))
+        loss_tcr = criterion_mse(denoise_model_p(transformed_input, stdn_var_un), tcr(denoise_model_p(imgn_un, stdn_var_un),random))
+        total_loss= loss + args.weight_tcr*loss_tcr
+    else:
+        total_loss= loss
+
+    total_loss.backward()
     optimizer.step()
     running_loss += loss
     if with_tcr:
@@ -158,8 +185,14 @@ if args.with_tcr > 0:
         for iteration, (data_sup, data_un) in enumerate(tqdm(zip(trainloader, trainloader_un), total=total_iter)):
             running_loss, loss_tcr = train(data_sup, data_un, denoise_model_p, running_loss, args.with_tcr, step_log)
             step_log += 1
-        if ((epoch+1)%10 == 0):
+        if ((epoch+1)%2 == 0):
             torch.save(denoise_model_p.state_dict(), "./checkpoint/denoise_checkpoint_with_tcr_" + str(epoch+1)+ ".pt")
+            torch.save({
+            'epoch': epoch,
+            'model_state_dict': denoise_model_p.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': running_loss,
+            }, "./checkpoint/denoise_checkpoint_with_tcr_resume_" + str(epoch+1)+ ".tar")
         print('Epoch-{0} lr: {1}'.format(epoch+1, optimizer.param_groups[0]['lr']))
         print('[%d] total loss: %.3f' % (epoch + 1, running_loss ))     
         print('tcr loss: %.3f' % (loss_tcr))  
