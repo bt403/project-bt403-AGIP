@@ -96,7 +96,6 @@ def batch_psnr(img, imclean, data_range):
 
 def validate():
     avg_psnr = 0
-    
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
@@ -141,7 +140,6 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     if with_tcr:
         bs = img_un.shape[0]
         random = torch.rand((bs, 1))
-
         noise = torch.zeros(img_un.size())
         stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
                         size=noise.size()[0])

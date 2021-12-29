@@ -14,5 +14,5 @@ def get_parser():
     parser.add_argument('--resume', type=int, default=0, help='training batch size')
     parser.add_argument('--workers', type=int, default=4, help='number of workers for data loader to use')
     #parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
-    parser.add_argument('--weight_tcr', type=float, default=0.01, help='random seed to use. Default=123')
+    parser.add_argument('--weight_tcr', type=float, default=10, help='random seed to use. Default=123')
     return parser

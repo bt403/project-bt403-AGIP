@@ -7,6 +7,26 @@ import random as rand
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 from sklearn.model_selection import train_test_split
 
+def get_imgs_path_train(in_path_data_1, in_path_data_2, in_path_data_3):
+  imgs_data_1 = os.listdir(in_path_data_1)
+  imgs_data_2 = os.listdir(in_path_data_2)
+  imgs_data_3 = os.listdir(in_path_data_3)
+
+  imgs_path = list()
+  for i in imgs_data_1:
+    _, ext = os.path.splitext(i)
+    if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
+      imgs_path.append(os.path.join(in_path_data_1, i))
+  for i in imgs_data_2:
+    _, ext = os.path.splitext(i)
+    if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
+      imgs_path.append(os.path.join(in_path_data_2, i))
+  for i in imgs_data_3:
+    _, ext = os.path.splitext(i)
+    if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
+      imgs_path.append(os.path.join(in_path_data_3, i))
+  return imgs_path
+
 def addNoise(x, sigma=None): 
     """
     We will use this helper function to add noise to some data. 
@@ -31,24 +51,8 @@ class NoisyDataset(torch.utils.data.Dataset):
     self.in_path_data_3 = in_path_data_3
     self.img_size = img_size # (180, 180)
     self.batch_size = batch_size
-
-    self.imgs_data_1 = os.listdir(self.in_path_data_1)
-    self.imgs_data_2 = os.listdir(self.in_path_data_2)
-    self.imgs_data_3 = os.listdir(self.in_path_data_3)
-
-    self.imgs_path = list()
-    for i in self.imgs_data_1:
-      _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
-        self.imgs_path.append(os.path.join(self.in_path_data_1, i))
-    for i in self.imgs_data_2:
-      _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
-        self.imgs_path.append(os.path.join(self.in_path_data_2, i))
-    for i in self.imgs_data_3:
-      _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg"]:
-        self.imgs_path.append(os.path.join(self.in_path_data_3, i))
+    
+    self.imgs_path = get_imgs_path_train(self.in_path_data_1, self.in_path_data_2, self.in_path_data_3)
 
   def __len__(self):
     return 8000*self.batch_size
@@ -153,6 +157,14 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.imgs_path = x_test
     else:
       self.imgs_path = x_train
+      print("images_path")
+      print(self.imgs_path)
+      self.imgs_path_train = get_imgs_path_train(self.in_path_data_1, self.in_path_data_2, self.in_path_data_3)
+      print("images_path train")
+      print(self.imgs_path_train)
+      self.imgs_path += self.imgs_path_train
+      print("images_path total")
+      print(self.imgs_path)
 
   def __len__(self):
     if (self.mode == "val"):
