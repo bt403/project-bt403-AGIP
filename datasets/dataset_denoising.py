@@ -149,11 +149,6 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
         self.imgs_path.append(os.path.join(self.in_path, i))
 
     x_train ,x_test = train_test_split(self.imgs_path,test_size=0.3, random_state=42)
-    print("split")
-    print("train")
-    print(len(x_train))
-    print("test")
-    print(len(x_test))
     if (self.mode == "val"):
       self.imgs_path = x_test
     else:
