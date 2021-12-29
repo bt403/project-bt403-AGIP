@@ -28,8 +28,6 @@ class TCR(nn.Module):
         bs= img.shape[0]
         W= img.shape[2]
         H= img.shape[3]
-        print("type image")
-        print(type(img))
         
         tx = ((self.max_tx - self.min_tx)*random  + self.min_tx)
         ty = ((self.max_ty -self. min_ty)*random + self.min_ty)
