@@ -137,7 +137,7 @@ class NoisyDatasetVal(torch.utils.data.Dataset):
 
 
 class NoisyDatasetUn(torch.utils.data.Dataset):
-  def __init__(self, in_path, mode='train', img_size=(320, 320), batch_size=1280):
+  def __init__(self, in_path, in_path_data_train_1=None, in_path_data_train_2=None, in_path_data_train_3=None, mode='train', img_size=(320, 320), batch_size=1280):
     super(NoisyDatasetUn, self).__init__()
   
     self.batch_size = batch_size
@@ -146,6 +146,8 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     self.imgs = os.listdir(self.in_path)
     self.imgs_path = list()
     self.img_size = img_size
+
+    
 
     for i in self.imgs:
       _, ext = os.path.splitext(i)
@@ -157,14 +159,17 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.imgs_path = x_test
     else:
       self.imgs_path = x_train
+      self.in_path_data_1 = in_path_data_train_1
+      self.in_path_data_2 = in_path_data_train_2
+      self.in_path_data_3 = in_path_data_train_3
       print("images_path")
-      print(self.imgs_path)
+      print(len(self.imgs_path))
       self.imgs_path_train = get_imgs_path_train(self.in_path_data_1, self.in_path_data_2, self.in_path_data_3)
       print("images_path train")
-      print(self.imgs_path_train)
+      print(len(self.imgs_path_train))
       self.imgs_path += self.imgs_path_train
       print("images_path total")
-      print(self.imgs_path)
+      print(len(self.imgs_path))
 
   def __len__(self):
     if (self.mode == "val"):
