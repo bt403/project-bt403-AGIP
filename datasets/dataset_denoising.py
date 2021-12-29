@@ -80,8 +80,8 @@ class NoisyDataset(torch.utils.data.Dataset):
     ground_truth = tv.transforms.ToTensor()(ground_truth)
     #print(ground_truth[0])
     #noisy = addNoise(ground_truth)
-    noisy = ground_truth
-    return noisy, ground_truth
+    #noisy = ground_truth
+    return (ground_truth)
 
 
 class NoisyDatasetVal(torch.utils.data.Dataset):
@@ -132,7 +132,7 @@ class NoisyDatasetVal(torch.utils.data.Dataset):
     #transform = tv.transforms.Compose([tv.transforms.ToTensor(),])
     ground_truth = np.array(cropped_clean) / 255.
     ground_truth =  tv.transforms.ToTensor()(ground_truth)
-    noisy = np.array(cropped_noisy) / 255.
+    #noisy = np.array(cropped_noisy) / 255.
     return ground_truth, ground_truth
 
 
@@ -160,14 +160,8 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.in_path_data_1 = in_path_data_train_1
       self.in_path_data_2 = in_path_data_train_2
       self.in_path_data_3 = in_path_data_train_3
-      print("images_path")
-      print(len(self.imgs_path))
       self.imgs_path_train = get_imgs_path_train(self.in_path_data_1, self.in_path_data_2, self.in_path_data_3)
-      print("images_path train")
-      print(len(self.imgs_path_train))
       self.imgs_path += self.imgs_path_train
-      print("images_path total")
-      print(len(self.imgs_path))
       random.seed(2)
       random.shuffle(self.imgs_path)
       print(self.imgs_path)
@@ -200,5 +194,5 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     ground_truth = tv.transforms.ToTensor()(ground_truth)
     #print(ground_truth[0])
     #noisy = addNoise(ground_truth)
-    noisy = ground_truth
-    return noisy, ground_truth
+    #noisy = ground_truth
+    return (ground_truth)

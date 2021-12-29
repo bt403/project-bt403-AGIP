@@ -114,10 +114,9 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
     denoise_model_p.zero_grad()
     optimizer.zero_grad()
 
-    img_train, target = data_sup[0].to('cuda:0', non_blocking=True), data_sup[1].to('cuda:0', non_blocking=True)  # Here the data is used in supervised fashion
+    img_train = data_sup[0].to('cuda:0', non_blocking=True) # Here the data is used in supervised fashion
     if (with_tcr):
-        b_size_unsup = data_un[0].shape[0]
-        img_un, target_un = data_un[0].to('cuda:0', non_blocking=True), data_un[1].to('cuda:0', non_blocking=True) 
+        img_un = data_un[0].to('cuda:0', non_blocking=True)
 
     noise = torch.zeros(img_train.size())
     stdn = np.random.uniform(noiseIntL[0], noiseIntL[1], \
