@@ -171,10 +171,6 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         wandb.log({"train_loss": loss}) 
 
     if with_tcr:
-        print("loss")
-        print(loss)
-        print("loss tcr")
-        print(loss_tcr)
         return (running_loss, loss_tcr)
 
     return running_loss
