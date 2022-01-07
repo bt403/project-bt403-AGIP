@@ -136,7 +136,7 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
   
     self.batch_size = batch_size
     self.in_path = in_path #
-    self.mode = mode #train or test
+    self.mode = mode 
     self.imgs = os.listdir(self.in_path)
     self.imgs_path = list()
     self.img_size = img_size
@@ -158,7 +158,6 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.imgs_path += self.imgs_path_train
       random.seed(2)
       random.shuffle(self.imgs_path)
-      #print(self.imgs_path)
 
   def __len__(self):
     if (self.mode == "val"):
@@ -186,7 +185,7 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     ground_truth = transform(cropped_clean)
     ground_truth = np.array(cropped_clean) / 255.
     ground_truth = tv.transforms.ToTensor()(ground_truth)
-    #print(ground_truth[0])
-    #noisy = addNoise(ground_truth)
-    #noisy = ground_truth
+
+    if (self.mode == "val"):
+      return ground_truth, ground_truth
     return ground_truth
