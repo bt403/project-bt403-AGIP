@@ -35,6 +35,7 @@ sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
 
 def validate():
     avg_psnr = 0
+    print(len(validationloader))
     with torch.no_grad():
         for batch in validationloader:
             input, target = batch[0].to(device), batch[1].to(device)
