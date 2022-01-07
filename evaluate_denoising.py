@@ -16,7 +16,9 @@ denoise_model = FFDNet(3)
 device_ids = [0]
 denoise_model_p = nn.DataParallel(denoise_model, device_ids=device_ids).cuda()
 
-denoise_model_p.load_state_dict(torch.load(args.checkpoint))
+#denoise_model_p.load_state_dict(torch.load(args.checkpoint))
+checkpoint = torch.load(args.checkpoint)
+denoise_model_p.load_state_dict(checkpoint['model_state_dict'])
 denoise_model_p.to(device)
 denoise_model_p.eval()
 
