@@ -19,7 +19,7 @@ class DataLoaderDenoising():
         super(DataLoaderDenoising, self).__init__()
         self.trainloader = torch.utils.data.DataLoader(NoisyDataset(dataset_dir_sup_1, dataset_dir_sup_2, dataset_dir_sup_3, 'train', (50,50), batch_size=batch_size), batch_size=batch_size, shuffle=True, num_workers=workers, pin_memory=True)
         self.trainloader_un = torch.utils.data.DataLoader(NoisyDatasetUn(dataset_dir_un_coco, dataset_dir_sup_1, dataset_dir_sup_2, dataset_dir_sup_3, mode='train', img_size=(50,50), batch_size=batch_size_un), batch_size=batch_size_un, shuffle=True, num_workers=workers, pin_memory=True)
-        self.validationloader_cbsd68 = torch.utils.data.DataLoader(NoisyDatasetVal(dataset_dir_val_1_gt, dataset_dir_val_1_noisy, mode='val', img_size=(480, 320)), batch_size=1, shuffle=True, num_workers=workers)
+        self.validationloader_cbsd68 = torch.utils.data.DataLoader(NoisyDatasetVal(dataset_dir_val_1_gt, dataset_dir_val_1_noisy, mode='val', img_size=(481, 321)), batch_size=1, shuffle=True, num_workers=workers)
         self.validationloader_coco = torch.utils.data.DataLoader(NoisyDatasetUn(dataset_dir_un_coco, mode='val',img_size=(480, 320), batch_size=batch_size), batch_size=1, shuffle=True, num_workers=workers, pin_memory=True)
         
     def get_trainloader(self):
