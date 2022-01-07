@@ -27,7 +27,7 @@ if (args.val_un > 0):
     validationloader = dataLoaderDenoising.get_validationloader_un()
     
 criterion_mse = nn.MSELoss().to(device)
-val_noiseL = 25
+val_noiseL = args.noise_level
 val_noiseL /= 255.
 sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
 

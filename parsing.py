@@ -7,6 +7,7 @@ def get_parser():
     parser.add_argument('--val_un', type=int, default=0, help='training batch size')
     parser.add_argument('--batch_size', type=int, default=10, help='training batch size')
     parser.add_argument('--batch_size_un', type=int, default=10, help='training batch size')
+    parser.add_argument('--noise_level', type=int, default=25, help='training batch size')
     #parser.add_argument('--testBatchSize', type=int, default=100, help='testing batch size')
     parser.add_argument('--epochs', type=int, default=60, help='number of epochs to train for')
     parser.add_argument('--lr', type=float, default=0.0005, help='Learning Rate. Default=0.01')
