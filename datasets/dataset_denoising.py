@@ -158,7 +158,7 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
       self.imgs_path += self.imgs_path_train
       random.seed(2)
       random.shuffle(self.imgs_path)
-      print(self.imgs_path)
+      #print(self.imgs_path)
 
   def __len__(self):
     if (self.mode == "val"):
