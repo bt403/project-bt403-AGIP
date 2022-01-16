@@ -18,13 +18,11 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 class TCR(nn.Module):
     def __init__(self):
         super(TCR, self).__init__()
-        #self.ang = np.deg2rad(20.0)    # Change the degree of rotation as per the task in hand 
-        self.ang = np.deg2rad(45.0)    # Change the degree of rotation as per the task in hand 
+        self.ang = np.deg2rad(20.0)    # Change the degree of rotation as per the task in hand 
         self.ang_neg= -1*self.ang
-        #self.max_tx, self.max_ty =6.0, 6.0      # Change as per the task
-        self.max_tx, self.max_ty =30.0, 30.0      # Change as per the task
-        self.min_tx, self.min_ty = -30.0, -30.0      # Change as per the task
-        self.max_z, self.min_z = 0.9, 1.1         # Change as per the task
+        self.max_tx, self.max_ty =6.0, 6.0      # Change as per the task
+        self.min_tx, self.min_ty = -6.0, -6.0      # Change as per the task
+        self.max_z, self.min_z = 1.00, 1.00         # Change as per the task
         
     def forward(self, img, random):
         bs= img.shape[0]
