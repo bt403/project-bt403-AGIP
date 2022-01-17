@@ -118,11 +118,19 @@ class NoisyDatasetVal(torch.utils.data.Dataset):
     clean_img = Image.open(img_path_gt).convert('RGB')
     noisy_img = Image.open(img_path_noisy).convert('RGB')
 
+    if (clean_img.size[0]%2 == 0):
+      size0 = clean_img.size[0]
+    else:
+      size0 = clean_img.size[0]-1
+    if (clean_img.size[1]%2 == 0):
+      size1 = clean_img.size[1]
+    else:
+      size1 = clean_img.size[1]-1
     left = 0
     top = 0
     # .crop(left, upper, right, lower)
-    cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
-    cropped_noisy = noisy_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
+    cropped_clean = clean_img.crop([left, top, left+size0, top+size1])
+    cropped_noisy = noisy_img.crop([left, top, left+size0, top+size1])
     #transform = tv.transforms.Compose([tv.transforms.ToTensor(),])
     ground_truth = np.array(cropped_clean) / 255.
     ground_truth =  tv.transforms.ToTensor()(ground_truth)
@@ -140,12 +148,13 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     self.imgs = os.listdir(self.in_path)
     self.imgs_path = list()
     self.img_size = img_size
-
+    c = 0
     for i in self.imgs:
-      _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
-        self.imgs_path.append(os.path.join(self.in_path, i))
-
+      if c < 600:
+        _, ext = os.path.splitext(i)
+        if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
+          self.imgs_path.append(os.path.join(self.in_path, i))
+          c+=1
     x_train ,x_test = train_test_split(self.imgs_path,test_size=0.3, random_state=42)
     if (self.mode == "val"):
       self.imgs_path = x_test
@@ -169,15 +178,29 @@ class NoisyDatasetUn(torch.utils.data.Dataset):
     idx = idx%len(self.imgs_path)
     img_path = self.imgs_path[idx]
     clean_img = Image.open(img_path).convert('RGB')
-    if (clean_img.size[0] > self.img_size[0]):
-        left = np.random.randint(clean_img.size[0] - self.img_size[0])
+    if self.mode == "val":
+      if (clean_img.size[0]%2 == 0):
+        size0 = clean_img.size[0]
+      else:
+        size0 = clean_img.size[0]-1
+      if (clean_img.size[1]%2 == 0):
+        size1 = clean_img.size[1]
+      else:
+        size1 = clean_img.size[1]-1
+      left = 0
+      top = 0
     else:
-        left = 0
-    if (clean_img.size[1] > self.img_size[1]):
-        top = np.random.randint(clean_img.size[1] - self.img_size[1])
-    else:
-        top = 0
-    cropped_clean = clean_img.crop([left, top, left+self.img_size[0], top+self.img_size[1]])
+      size0 = self.img_size[0]
+      size1 = self.img_size[1]
+      if (clean_img.size[0] > self.img_size[0]):
+          left = np.random.randint(clean_img.size[0] - self.img_size[0])
+      else:
+          left = 0
+      if (clean_img.size[1] > self.img_size[1]):
+          top = np.random.randint(clean_img.size[1] - self.img_size[1])
+      else:
+          top = 0
+    cropped_clean = clean_img.crop([left, top, left+size0, top+size1])
    
     transform = tv.transforms.Compose([
                                     tv.transforms.RandomHorizontalFlip(p=0.5),

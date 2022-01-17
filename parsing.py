@@ -4,6 +4,8 @@ def get_parser():
     parser = argparse.ArgumentParser(description='PyTorch TCR for image denoising')
     parser.add_argument('--with_tcr', type=int, default=0, help='determine if tcr will be used. 1 if True.')
     parser.add_argument('--val_un', type=int, default=0, help='determine if validation will be done in the validation Coco dataset. 1 if True.')
+    parser.add_argument('--val_kodak', type=int, default=0, help='determine if validation will be done in the validation Kodak24. 1 if True.')    
+    parser.add_argument('--val_mcmaster', type=int, default=0, help='determine if validation will be done in the validation McMaster 1 if True.')    
     parser.add_argument('--batch_size', type=int, default=10, help='training batch size for supervised')
     parser.add_argument('--batch_size_un', type=int, default=10, help='training batch size for unsupervised')
     parser.add_argument('--noise_level', type=int, default=25, help='noise level for validation run')
