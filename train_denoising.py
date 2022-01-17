@@ -60,8 +60,13 @@ if (args.resume > 0):
     checkpoint = torch.load(args.checkpoint)
     denoise_model_p.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    print(optimizer)
+    for g in optimizer.param_groups:
+      g['lr'] = args.lr
+    print(optimizer)
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
+
 
 
 

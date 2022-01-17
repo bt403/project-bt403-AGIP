@@ -7,7 +7,8 @@ from parsing import get_parser
 from models.FFDNet import FFDNet
 from dataloaders import DataLoaderDenoising
 from torch.autograd import Variable
-
+import numpy as np
+import math
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 args = get_parser().parse_args()
@@ -45,8 +46,12 @@ def validate():
             sigma_noise = Variable(torch.cuda.FloatTensor([val_noiseL]))
             out_val = torch.clamp(imgn_val-denoise_model_p(imgn_val, sigma_noise), 0., 1.)
 
-            mse = criterion_mse(out_val, target)
-            psnr = 10 * torch.log10(1 / mse)
+            #mse = criterion_mse(out_val, target)
+            #psnr = 10 * torch.log10(1 / mse)
+            mse = np.mean((out_val - target)**2)
+            if mse == 0:
+                return float('inf')
+            psnr = 20 * math.log10(255.0 / math.sqrt(mse))
             avg_psnr += psnr
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validationloader)))
 
