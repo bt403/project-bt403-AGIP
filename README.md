@@ -7,3 +7,7 @@ Examples of loading the data, training and validating the models can be seen in 
 
 ## Trained Models
 https://drive.google.com/drive/folders/1ZiQcpziQ86NFLrUV1KsJHzfGz1nhK2Y4?usp=sharing
+
+## Supporting repositories
+Original FFDNet repository: http://www.ipol.im/pub/art/2019/231/
+Original TCR repository: https://github.com/aamir-mustafa/Transformation-CR
