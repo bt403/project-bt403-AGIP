@@ -99,13 +99,13 @@ class NoisyDatasetVal(torch.utils.data.Dataset):
     self.imgs_path_gt = list()
     for i in self.imgs_gt:
       _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
+      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png", ".tif"]:
         self.imgs_path_gt.append(os.path.join(self.in_path_gt, i))
 
     self.imgs_path_noisy = list()
     for i in self.imgs_noisy:
       _, ext = os.path.splitext(i)
-      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png"]:
+      if ext in [".jpg", ".jpg", ".bmp", ".JPEG", ".jpeg", ".png", ".tif"]:
         self.imgs_path_noisy.append(os.path.join(self.in_path_noisy, i))
 
   def __len__(self):
