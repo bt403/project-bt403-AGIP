@@ -17,7 +17,6 @@ denoise_model = FFDNet(3)
 device_ids = [0]
 denoise_model_p = nn.DataParallel(denoise_model, device_ids=device_ids).cuda()
 
-
 if (args.checkpoint.endswith("pt")):
     denoise_model_p.load_state_dict(torch.load(args.checkpoint))
 else:

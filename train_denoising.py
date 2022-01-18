@@ -15,7 +15,6 @@ from skimage.metrics import peak_signal_noise_ratio
 wandb.init(project="my-test-project", entity="btafur")
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-print(device)
 args = get_parser().parse_args()
 
 wandb.config = {
@@ -47,8 +46,6 @@ denoise_model = FFDNet(3).to(device)
 denoise_model.apply(weights_init_kaiming)
 tcr = TCR().to(device)
 
-
-
 device_ids = [0]
 denoise_model_p = nn.DataParallel(denoise_model, device_ids=device_ids).cuda()
 
@@ -66,8 +63,6 @@ if (args.resume > 0):
     print(optimizer)
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
-
-
 
 
 dataLoaderDenoising = DataLoaderDenoising(args.batch_size, args.batch_size_un, args.workers)
@@ -131,13 +126,12 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
         noise[nx, :, :, :] = torch.FloatTensor(sizen).\
                             normal_(mean=0, std=stdn[nx])
     imgn_train = img_train + noise.to(device)
-    # Create input Variables
+
     img_train = Variable(img_train.cuda())
     imgn_train = Variable(imgn_train.cuda())
     noise = Variable(noise.cuda())
     stdn_var = Variable(torch.cuda.FloatTensor(stdn))
-    #print(imgn_train.shape)
-    # Evaluate model and optimize it
+
     out_train = denoise_model_p(imgn_train, stdn_var)
     loss = criterion_mse(out_train, noise) / (imgn_train.size()[0]*2)
 
@@ -152,7 +146,6 @@ def train(data_sup, data_un, denoise_model_p, running_loss, with_tcr, step):
             noise[nx, :, :, :] = torch.FloatTensor(sizen).\
                                 normal_(mean=0, std=stdn[nx])
         imgn_un = img_un + noise.to(device)
-        # Create input Variables
         img_un = Variable(img_un.cuda())
         noise = Variable(noise.cuda())
         imgn_un = Variable(imgn_un.type(torch.FloatTensor).cuda())
